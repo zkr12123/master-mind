@@ -52,7 +52,7 @@ struct mm_code_maker{
         std::vector<int> white;
 
         for(int i = 0; i < attempt.size(); i++){
-          if(attmpt[i] == sequence[i]){
+          if(attempt[i] == sequence[i]){
             black_hits++;
             black.push_back(i);
           }
