@@ -4,7 +4,7 @@
 bool check_contain(int n, const std::vector<int>& v);
 
 int main(){
-  std::vector<int> attempt, sequence, black, white;
+  std::vector<int> attempt, sequence, black;
 
   for(int i = 0; i < 4; i++){
     int tmp;
@@ -14,6 +14,7 @@ int main(){
   std::cout << std::endl;
 
   while(true){
+    std::vector<int> white;
   for(int i = 0; i < 4; i++){
     int tmp;
     std::cin >> tmp;
