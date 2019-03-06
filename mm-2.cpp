@@ -12,30 +12,30 @@ struct mm_code_maker{
         length = i_length;
         num = i_num;
     }
-    
+
     void generate_sequence(){
         for(int i = 0; i < length; i++){
             sequence.push_back(randn(num));
         }
     }
-    
+
     void give_feedback(const std::vector<int>& attempt, int& black_hits, int& white_hits){
         /// imagine this is implemented...
     }
-    
+
     std::vector<int> sequence;
-    
+
     int length;
-    int num; 
+    int num;
 };
 
 struct mm_solver{
-    
+
     void init(int i_length, int i_num){
         length = i_length;
         num = i_num;
     }
-    
+
     /// this member function creates an attempt to find the right code
     /// this version generates a random attempt, then checks whether
     /// it has already been tried before and was not the right solution
@@ -44,18 +44,18 @@ struct mm_solver{
     void create_attempt(std::vector<int>& attempt){
         bool ready = false;
         while(!ready){
-            
+
             for(int i = 0; i < length; i++){
                 attempt.push_back(randn(num));
             }
-            
+
             bool found = false;
             for(int i = 0; i < not_correct.size() && !found; i++){
                 if(attempt == not_correct[i]){
                     found = true;
                 }
             }
-            
+
             if(found){
                 /// the following printing can be used for testing purposes in order
                 /// to see how much of an improvement this version is on the previous one
@@ -67,7 +67,7 @@ struct mm_solver{
             }
         }
     }
-    
+
     /// this version just learns whether an attempt is correct or not
     /// if it is not, it adds it adds it to the list of unsuccessful attempts
     /// this is clearly still far from being a good implementation
@@ -77,31 +77,31 @@ struct mm_solver{
             not_correct.push_back(attempt);
         }
     }
-    
+
     std::vector<std::vector<int> > not_correct;
     
     int length;
     int num;
-    
+
 };
 
 /// the main is the same as in the previous example
 
 int main(){
-    
+
     set_random_seed();
-    
+
     int length, num;
     std::cout << "enter length of sequence and number of possible values:" << std::endl;
     std::cin >> length >> num;
-   
+
     mm_solver solver;
     solver.init(length, num);
-    
+
     mm_code_maker maker;
     maker.init(length, num);
     maker.generate_sequence();
-    
+
     int black_hits=0, white_hits=0;
     int attempts_limit = 5000;
     int attempts = 0;
@@ -118,9 +118,9 @@ int main(){
         solver.learn(attempt, black_hits, white_hits);
         attempts++;
     }
-    
+
     if(black_hits == length){
-        std::cout << "the solver has found the sequence in " << attempts << " attempts" << std::endl;        
+        std::cout << "the solver has found the sequence in " << attempts << " attempts" << std::endl;
     }
     else{
         std::cout << "after " << attempts << " attempts still no solution" << std::endl;

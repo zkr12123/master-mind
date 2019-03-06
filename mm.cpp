@@ -12,6 +12,8 @@
 /// functions for random number generation, do not alter the declarations
 void set_random_seed();
 int randn(int n);
+bool check_contain(int n, const std::vector<int>& v);
+int check_repeat(const std::vector<int>& v);
 
 /// you can define and use additional functions and structs,
 /// add here the declarations for any other functions
@@ -61,35 +63,31 @@ struct mm_code_maker{
 
         for(int i = 0; i < attempt.size(); i++){
           for(int j = 0; j < sequence.size(); j++){
-            for(int k = 0; k < black.size(); k++){
-              if((attempt[i] == sequence[j]) && (j != black[k])){
-                white.push_back(j); //contains repeated white_hits
-              }
+            if((attempt[i] == sequence[j]) && (!check_contain(j, black))){
+              white.push_back(j); //contains repeated
             }
           }
         }
 
-        if(white.size() > 0){
-          //std::vector<int> truwhite;
-          //truwhite.push_back(white[0]);
+        /*if(white.size() > 0){
           white_hits++;
           for(int i = 1; i < white.size(); i++){
 
             bool repeated = false;
 
             for(int j = 0; j < white.size() && !repeated; j++){
-              if(white[i] == white[j]){
+              if((white[i] == white[j]) && (i != j)){ //problem: repeated it self, fixed
                 repeated = true;
               }
             }
 
             if(!repeated){
-              //truwhite.push_back(white[i]);
               white_hits++;
             }
 
           }
-    }
+    } */ //problematic
+    white_hits = check_repeat(white);
 
   }
 
@@ -169,6 +167,34 @@ void set_random_seed(){
 
 int randn(int n){
     return std::rand() % n;
+}
+
+bool check_contain(int n, const std::vector<int>& v){
+  bool contain = false;
+  for(int i = 0; i < v.size() && !contain; i++){
+    if(n == v[i]){
+      contain = true;
+    }
+  }
+  return contain;
+}
+
+int check_repeat(const std::vector<int>& v){
+  std::vector<int> single;
+
+  for(int i = 0; i < v.size(); i++){
+    bool repeat = false;
+    for(int j = 0; j < single.size() && !repeat; j++){
+      if(v[i] == single[j] && i != j){
+        repeat = true;
+      }
+    }
+    if(!repeat){
+      single.push_back(v[i]);
+    }
+  }
+
+  return single.size();
 }
 
 /// add here the implementation for any other functions you wish to define and use
