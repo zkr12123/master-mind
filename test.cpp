@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <ctime>
 
+//this checks check_repeat, check_contain, and give_feedback
+
 void set_random_seed();
 int randn(int n);
 bool check_contain(int n, const std::vector<int>& v);

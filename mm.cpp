@@ -23,6 +23,8 @@ int check_repeat(const std::vector<int>& v);
 
 /// this is the struct definition for the code maker
 /// do not alter the name
+
+
 struct mm_code_maker{
 
     /// this member function sets the values for the member data
@@ -120,6 +122,33 @@ struct mm_solver{
     void init(int i_length, int i_num){
         length = i_length;
         num = i_num;
+        std::vector<int> tmp;
+        for(int i = 0; i < length; i++){
+          tmp.push_back(randn(num));
+        }
+        set.push_back(tmp);
+
+        while(set.size() < pow(num, length)){
+
+          std::vector<int> tmp;
+          bool repeated = false;
+          for(int i = 0; i < length; i++){
+            tmp.push_back(randn(num));
+          }
+
+          for(int i = 0; i < set.size() && !repeated; i++){
+            if(tmp == set[i]){
+              repeated = true;
+            }
+          }
+
+          if(!repeated){
+            set.push_back(tmp);
+          }
+        }
+
+
+
 
         /// you can include additional implementation lines here if needed
 
@@ -141,6 +170,7 @@ struct mm_solver{
 
     int length;
     int num;
+    std::vector<std::vector<int>> set;
 
     /// you may add other member functions and member data as needed
     /// (keep in mind the distinction between member function variables
@@ -196,5 +226,72 @@ int check_repeat(const std::vector<int>& v){
 
   return single.size();
 }
+
+int num_of_digits(int num){//returns number of digits in an int
+  int i = 10, j = 1;
+  while(true){
+    if(num < i){
+      return j;
+    }
+    i = i * 10;
+    j = j + 1;
+  }
+}
+
+void extract_digits(int num, std::vector<int>& v){ //extract digits from an int into a vector
+  int length = num_of_digits(num);
+  if(length == 1){
+    v.push_back(num);
+  }
+  else{
+    int lsb = num % 10;
+    v.push_back(lsb);
+    int tmp = lsb;
+
+    for(int i = 100, j = 10; i <= pow(10, length - 1); i = i * 10, j = j * 10){
+      v.push_back((num % i - tmp) / j);
+      tmp = num % i;
+    }
+
+    v.push_back((num - tmp) / pow(10, length - 1));
+  }
+}
+
+  int pow(int a, int b){
+    int n = a;
+    for(int i = 1; i < b; i++){
+      n = n * a;
+    }
+    return n;
+  }
+
+  std::vector<int> pool_generator(int length, int num, int count){
+    //int set_length = pow(num, length);
+    std::vector<int> v, tmp;
+    //int tmp = count;
+    for(int i = 0; i < length; i++){
+      v.push_back(0);
+    }
+
+    int quotient = count;
+    int remainder;
+    while(quotient != 0){
+      remainder = quotient % num;
+      quotient = (int) quotient / num;
+      tmp.push_back(remainder);
+    }
+
+    for(int i = v.size() - 1, j = 0; j < tmp.size(); i--, j++){
+      v[i] = tmp[j];
+    }
+
+    return v;
+  }
+
+
+
+
+
+
 
 /// add here the implementation for any other functions you wish to define and use

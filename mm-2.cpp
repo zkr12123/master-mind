@@ -79,7 +79,7 @@ struct mm_solver{
     }
 
     std::vector<std::vector<int> > not_correct;
-    
+
     int length;
     int num;
 
