@@ -4,6 +4,7 @@
 #include <ctime>
 
 //this checks check_repeat, check_contain, and give_feedback
+//wrong, need fix
 
 void set_random_seed();
 int randn(int n);
@@ -117,7 +118,9 @@ struct mm_solver{
 int main(){
   set_random_seed();
   mm_code_maker maker;
-  maker.init(4, 6);
+  int length = 10;
+  int num = 9;
+  maker.init(length, num);
   maker.generate_sequence();
 
   for(int i = 0; i < maker.sequence.size(); i++){
@@ -129,7 +132,7 @@ int main(){
 
   while(true){
     std::vector<int> attempt;
-  for(int i = 0; i < 4; i++){
+  for(int i = 0; i < length; i++){
     int tmp;
     std::cin >> tmp;
     attempt.push_back(tmp);
