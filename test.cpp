@@ -4,6 +4,7 @@
 #include <ctime>
 
 //this checks check_repeat, check_contain, and give_feedback
+//also fixes bug
 //wrong, need fix
 
 void set_random_seed();
@@ -37,16 +38,17 @@ struct mm_code_maker{
 
         for(int i = 0; i < attempt.size(); i++){
           if(attempt[i] == sequence[i]){
-            black_hits++;
             black.push_back(i);
           }
         }
+        black_hits = black.size();
 
 
         for(int i = 0; i < attempt.size(); i++){
           for(int j = 0; j < sequence.size(); j++){
-            if((attempt[i] == sequence[j]) && (!check_contain(j, black))){
-              white.push_back(j); //contains repeated
+            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black))){ //found bug, position of both sequence and attempt shouldnt be taken into account when a black hit occurs
+              //white.push_back(j); //contains repeated //found bug, j is position of sequence, since attempt is fixed to be compared with sequence, position of sequence is not repeated when position of sequence is pushed_back
+              white.push_back(i);
             }
           }
         }
@@ -159,14 +161,16 @@ int randn(int n){
     return std::rand() % n;
 }
 
-bool check_contain(int n, const std::vector<int>& v){
-  bool contain = false;
-  for(int i = 0; i < v.size() && !contain; i++){
+bool check_contain(int n, const std::vector<int>& v){ //check if  n is contained in vector v
+  //bool contain = false;
+  for(int i = 0; i < v.size(); i++){
     if(n == v[i]){
-      contain = true;
+      //contain = true;
+      return true;
     }
   }
-  return contain;
+
+  return false;
 }
 
 int check_repeat(const std::vector<int>& v){
@@ -175,7 +179,7 @@ int check_repeat(const std::vector<int>& v){
   for(int i = 0; i < v.size(); i++){
     bool repeat = false;
     for(int j = 0; j < single.size() && !repeat; j++){
-      if(v[i] == single[j] && i != j){
+      if((v[i] == single[j]) && (i != j)){
         repeat = true;
       }
     }
