@@ -8,8 +8,8 @@ int pow(int a, int b);
 
 int main(){
   std::cout << "pumping vectors..." << std::endl;
-  int num = 9;
-  int length = 9;
+  int num = 6;
+  int length = 4;
   std::vector<std::vector<int>> pool;
 
   for(int i = 0; i < pow(num, length); i++){

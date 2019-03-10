@@ -34,7 +34,8 @@ struct mm_code_maker{
         /// and provides feedback in terms of black hits
         /// and white hits (see linked paper)
         std::vector<int> black;
-        std::vector<int> white;
+        std::vector<int> whiteseq;
+        std::vector<int> whiteatt;
 
         for(int i = 0; i < attempt.size(); i++){
           if(attempt[i] == sequence[i]){
@@ -43,17 +44,36 @@ struct mm_code_maker{
         }
         black_hits = black.size();
 
-
-        for(int i = 0; i < attempt.size(); i++){
+        for(int i = 0; i < attempt.size(); i++){ //hopefully fixed
           for(int j = 0; j < sequence.size(); j++){
-            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black))){ //found bug, position of both sequence and attempt shouldnt be taken into account when a black hit occurs
-              //white.push_back(j); //contains repeated //found bug, j is position of sequence, since attempt is fixed to be compared with sequence, position of sequence is not repeated when position of sequence is pushed_back
-              white.push_back(i);
+            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) && (!check_contain(j, whiteseq)) && (!check_contain(i, whiteatt)) ){
+              whiteseq.push_back(j);
+              whiteatt.push_back(i);
             }
           }
         }
 
-        white_hits = check_repeat(white);
+        white_hits = whiteseq.size();
+
+
+        /*for(int i = 0; i < attempt.size(); i++){ //fatal bug: cannot use elimination of same index method
+          for(int j = 0; j < sequence.size(); j++){
+            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black))){ //found bug, position of both sequence and attempt shouldnt be taken into account when a black hit occurs
+              //white.push_back(j); //contains repeated //found bug, j is position of sequence, since attempt is fixed to be compared with sequence, position of sequence is not repeated when position of sequence is pushed_back
+              whiteatt.push_back(i);
+              whiteseq.push_back(j);
+            }
+          }
+        }
+
+        if(check_repeat(whiteatt) < check_repeat(whiteseq)){
+          white_hits = check_repeat(whiteatt);
+        }
+        else{
+          white_hits = check_repeat(whiteseq);
+        }*/
+
+        //white_hits = check_repeat(white);
 
       /*  if(white.size() > 0){
           white_hits++;

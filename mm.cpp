@@ -50,13 +50,14 @@ struct mm_code_maker{
     }
 
     /// do not alter the function interface (name, parameter list, void return)
-    void give_feedback(const std::vector<int>& attempt, int& black_hits, int& white_hits){ //feedback still wrong
+    void give_feedback(const std::vector<int>& attempt, int& black_hits, int& white_hits){
         /// write here your implementation for this function
         /// which takes in input an attempt
         /// and provides feedback in terms of black hits
         /// and white hits (see linked paper)
         std::vector<int> black;
-        std::vector<int> white;
+        std::vector<int> whiteseq;
+        std::vector<int> whiteatt;
 
         for(int i = 0; i < attempt.size(); i++){
           if(attempt[i] == sequence[i]){
@@ -65,17 +66,36 @@ struct mm_code_maker{
         }
         black_hits = black.size();
 
-
-        for(int i = 0; i < attempt.size(); i++){
+        for(int i = 0; i < attempt.size(); i++){ //hopefully fixed
           for(int j = 0; j < sequence.size(); j++){
-            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black))){ //found bug, position of both sequence and attempt shouldnt be taken into account when a black hit occurs
-              //white.push_back(j); //contains repeated //found bug, j is position of sequence, since attempt is fixed to be compared with sequence, position of sequence is not repeated when position of sequence is pushed_back
-              white.push_back(i);
+            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) && (!check_contain(j, whiteseq)) && (!check_contain(i, whiteatt)) ){
+              whiteseq.push_back(j);
+              whiteatt.push_back(i);
             }
           }
         }
 
-        white_hits = check_repeat(white);
+        white_hits = whiteseq.size();
+
+
+        /*for(int i = 0; i < attempt.size(); i++){ //fatal bug: cannot use elimination of same index method
+          for(int j = 0; j < sequence.size(); j++){
+            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black))){ //found bug, position of both sequence and attempt shouldnt be taken into account when a black hit occurs
+              //white.push_back(j); //contains repeated //found bug, j is position of sequence, since attempt is fixed to be compared with sequence, position of sequence is not repeated when position of sequence is pushed_back
+              whiteatt.push_back(i);
+              whiteseq.push_back(j);
+            }
+          }
+        }
+
+        if(check_repeat(whiteatt) < check_repeat(whiteseq)){
+          white_hits = check_repeat(whiteatt);
+        }
+        else{
+          white_hits = check_repeat(whiteseq);
+        }*/
+
+        //white_hits = check_repeat(white);
 
       /*  if(white.size() > 0){
           white_hits++;
@@ -369,7 +389,8 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
   void give_feedback_trial(const std::vector<int>& attempt, const std::vector<int>& trial, int& black_hits, int& white_hits){
 
       std::vector<int> black;
-      std::vector<int> white;
+      std::vector<int> whiteseq;
+      std::vector<int> whiteatt;
 
       for(int i = 0; i < trial.size(); i++){
         if(trial[i] == attempt[i]){
@@ -382,13 +403,14 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
 
       for(int i = 0; i < trial.size(); i++){
         for(int j = 0; j < attempt.size(); j++){
-          if( (trial[i] == attempt[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) ){
-            white.push_back(i); //contains repeated //fixed bug
+          if( (trial[i] == attempt[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) && (!check_contain(j, whiteseq)) && (!check_contain(i, whiteatt)) ){
+            whiteseq.push_back(i);
+            whiteatt.push_back(j);
           }
         }
       }
 
-  white_hits = check_repeat(white);
+  white_hits = whiteseq.size();
 
 }
 
