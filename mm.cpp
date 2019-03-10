@@ -16,7 +16,9 @@ bool check_contain(int n, const std::vector<int>& v);
 int check_repeat(const std::vector<int>& v);
 std::vector<int> pool_generator(int length, int num, int count);
 int pow(int a, int b);
-void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int& black_hits, int& white_hits);
+void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int num, int& black_hits, int& white_hits);
+int number_of_num(const std::vector<int>& v, int num);
+int min(int n1, int n2);
 
 /// you can define and use additional functions and structs,
 /// add here the declarations for any other functions
@@ -55,7 +57,29 @@ struct mm_code_maker{
         /// which takes in input an attempt
         /// and provides feedback in terms of black hits
         /// and white hits (see linked paper)
-        std::vector<int> black;
+        int total_hits = 0;
+        black_hits = 0;
+
+        std::vector<int> n_attempt;
+        std::vector<int> n_sequence;
+        for(int i = 0; i < num; i++){
+          n_attempt.push_back(number_of_num(attempt, i));
+          n_sequence.push_back(number_of_num(sequence, i));
+        }
+
+        for(int i = 0; i < num; i++){
+          total_hits = total_hits + min(n_sequence[i], n_attempt[i]);
+        }
+
+        for(int i = 0; i < length; i++){
+          if(attempt[i] == sequence[i]){
+            black_hits++;
+          }
+        }
+
+        white_hits = total_hits - black_hits;
+
+        /*std::vector<int> black;
         std::vector<int> whiteseq;
         std::vector<int> whiteatt;
 
@@ -75,7 +99,7 @@ struct mm_code_maker{
           }
         }
 
-        white_hits = whiteseq.size();
+        white_hits = whiteseq.size();*/
 
 
         /*for(int i = 0; i < attempt.size(); i++){ //fatal bug: cannot use elimination of same index method
@@ -209,7 +233,7 @@ struct mm_solver{
         //if(black_hits < length){
           int black_new, white_new;
           for(int i = 0; i < pool.size(); i++){
-            give_feedback_trial(attempt, pool[i], black_new, white_new);
+            give_feedback_trial(attempt, pool[i], num, black_new, white_new);
             if((black_new == black_hits) && (white_new == white_hits)){
               newpool.push_back(pool[i]);
             }
@@ -386,32 +410,51 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
     return v;
   }
 
-  void give_feedback_trial(const std::vector<int>& attempt, const std::vector<int>& trial, int& black_hits, int& white_hits){
+  void give_feedback_trial(const std::vector<int>& attempt, const std::vector<int>& trial, int num, int& black_hits, int& white_hits){
 
-      std::vector<int> black;
-      std::vector<int> whiteseq;
-      std::vector<int> whiteatt;
+    int total_hits = 0;
+    black_hits = 0;
+    int length = attempt.size();
 
-      for(int i = 0; i < trial.size(); i++){
-        if(trial[i] == attempt[i]){
-          //black_hits++;
-          black.push_back(i);
-        }
+    std::vector<int> n_attempt;
+    std::vector<int> n_sequence;
+    for(int i = 0; i < num; i++){
+      n_attempt.push_back(number_of_num(trial, i));
+      n_sequence.push_back(number_of_num(attempt, i));
+    }
+
+    for(int i = 0; i < num; i++){
+      total_hits = total_hits + min(n_sequence[i], n_attempt[i]);
+    }
+
+    for(int i = 0; i < length; i++){
+      if(trial[i] == attempt[i]){
+        black_hits++;
       }
-      black_hits = black.size();
+    }
 
+    white_hits = total_hits - black_hits;
 
-      for(int i = 0; i < trial.size(); i++){
-        for(int j = 0; j < attempt.size(); j++){
-          if( (trial[i] == attempt[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) && (!check_contain(j, whiteseq)) && (!check_contain(i, whiteatt)) ){
-            whiteseq.push_back(i);
-            whiteatt.push_back(j);
-          }
-        }
-      }
+}
 
-  white_hits = whiteseq.size();
+int min(int n1, int n2){//out put the smaller num of the two
+  if(n1 < n2){
+    return n1;
+  }
+  else{
+    return n2;
+  }
 
+}
+
+int number_of_num(const std::vector<int>& v, int num){
+  int n = 0;
+  for(int i = 0; i < v.size(); i++){
+    if(v[i] == num){
+      n++;
+    }
+  }
+  return n;
 }
 
 
