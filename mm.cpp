@@ -50,7 +50,7 @@ struct mm_code_maker{
     }
 
     /// do not alter the function interface (name, parameter list, void return)
-    void give_feedback(const std::vector<int>& attempt, int& black_hits, int& white_hits){
+    void give_feedback(const std::vector<int>& attempt, int& black_hits, int& white_hits){ //feedback still wrong
         /// write here your implementation for this function
         /// which takes in input an attempt
         /// and provides feedback in terms of black hits

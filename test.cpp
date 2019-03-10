@@ -5,7 +5,7 @@
 
 //this checks check_repeat, check_contain, and give_feedback
 //also fixes bug
-//wrong, need fix
+//wrong, need fix, fixed, still wrong
 
 void set_random_seed();
 int randn(int n);
