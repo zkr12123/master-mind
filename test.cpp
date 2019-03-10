@@ -131,20 +131,28 @@ int main(){
   std::cout << std::endl;
 
   int black = 0, white = 0;
+  int trial = 0;
 
-  while(true){
+  while(trial < 10){
     std::vector<int> attempt;
   for(int i = 0; i < length; i++){
-    int tmp;
+    /*int tmp;
     std::cin >> tmp;
-    attempt.push_back(tmp);
+    attempt.push_back(tmp);*/
+    attempt.push_back(randn(num));
   }
+
+  for(int i = 0; i < attempt.size(); i++){
+    std::cout << attempt[i] << " ";
+  }
+  std::cout << std::endl;
 
   maker.give_feedback(attempt, black, white);
   std::cout << black << " ; " << white << std::endl;
 
   black = 0;
   white = 0;
+  trial ++;
 
 
 

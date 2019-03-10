@@ -169,9 +169,13 @@ struct mm_solver{
     /// do not alter the function interface (name, parameter list, void return)
     void create_attempt(std::vector<int>& attempt){
         /// write your implementation here
-        for(int i = 0; i < length; i++){
+        /*for(int i = 0; i < length; i++){
           attempt.push_back(randn(num));
-        }
+        }*/
+        attempt = pool[randn(pool.size())];
+        //attempt = pool[0];
+
+
 
     }
 
@@ -182,20 +186,18 @@ struct mm_solver{
         /// write your implementation here
         std::vector<std::vector<int>> newpool;
 
-        if(black_hits < length){
+        //if(black_hits < length){
+          int black_new, white_new;
           for(int i = 0; i < pool.size(); i++){
-
-            int black_new, white_new;
             give_feedback_trial(attempt, pool[i], black_new, white_new);
-
-            if(black_new == black_hits && white_new == white_hits){
+            if((black_new == black_hits) && (white_new == white_hits)){
               newpool.push_back(pool[i]);
             }
 
           }
           pool.clear();
           pool = newpool;
-        }
+        //}
 
     }
 
@@ -242,7 +244,7 @@ int main(){
             std::cout << attempt[i] << " ";
         }
         std::cout << std::endl;
-        std::cout << "black pegs: " << black_hits << " " << " white pegs: " << white_hits << std::endl;
+        std::cout << "black pegs: " << black_hits << " " << " white pegs: " << white_hits << " ; " << solver.pool.size() << std::endl;
         solver.learn(attempt, black_hits, white_hits);
         attempts++;
     }
@@ -364,23 +366,24 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
     return v;
   }
 
-  void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int& black_hits, int& white_hits){
+  void give_feedback_trial(const std::vector<int>& attempt, const std::vector<int>& trial, int& black_hits, int& white_hits){
 
       std::vector<int> black;
       std::vector<int> white;
 
       for(int i = 0; i < trial.size(); i++){
         if(trial[i] == attempt[i]){
-          black_hits++;
+          //black_hits++;
           black.push_back(i);
         }
       }
+      black_hits = black.size();
 
 
       for(int i = 0; i < trial.size(); i++){
         for(int j = 0; j < attempt.size(); j++){
-          if((trial[i] == attempt[j]) && (!check_contain(j, black))){
-            white.push_back(j); //contains repeated
+          if( (trial[i] == attempt[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) ){
+            white.push_back(i); //contains repeated //fixed bug
           }
         }
       }
