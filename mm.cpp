@@ -216,8 +216,17 @@ struct mm_solver{
         /*for(int i = 0; i < length; i++){
           attempt.push_back(randn(num));
         }*/
+        if(length > 7 && num > 7){
+          if(num_of_attempt < length){
+            for(int i = 0; i < length; i++){
+              attempt.push_back(num_of_attempt);
+            }
+          }
+        }
+
         attempt = pool[randn(pool.size())];
         //attempt = pool[0];
+
 
 
 
@@ -252,6 +261,7 @@ struct mm_solver{
     int length;
     int num;
     std::vector<std::vector<int>> pool;
+    int num_of_attempt = 0;
 
     /// you may add other member functions and member data as needed
     /// (keep in mind the distinction between member function variables
