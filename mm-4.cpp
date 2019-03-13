@@ -2,15 +2,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-#include <chrono>
 
-/// you can add other headers as needed
-/// but only headers from the standard library
-/// and not the algorithm header
 
-/// do not use using namespace std
-
-/// functions for random number generation, do not alter the declarations
 void set_random_seed();
 int randn(int n);
 bool check_contain(int n, const std::vector<int>& v);
@@ -20,33 +13,19 @@ int pow(int a, int b);
 void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int num, int& black_hits, int& white_hits);
 int number_of_num(const std::vector<int>& v, int num);
 int min(int n1, int n2);
-bool check_contain_vector(const std::vector<int>& v1, const std::vector<std::vector<int>>& v2);
 
-/// you can define and use additional functions and structs,
-/// add here the declarations for any other functions
-/// and/or structs you wish to define and use
-/// (the implementation for functions that don't belong to a struct
-/// should be added after the main)
 
-/// this is the struct definition for the code maker
-/// do not alter the name
 
 
 struct mm_code_maker{
 
-    /// this member function sets the values for the member data
-    /// representing the length of the code
-    /// and the number of symbols (the symbols will be 0 to i_num - 1)
-    /// (this should be a constructor in proper OOP but ok)
-    /// do not alter this function
+
     void init(int i_length, int i_num){
         length = i_length;
         num = i_num;
     }
 
-    /// this member function generates a random sequence based
-    /// on the length and num parameters stored as member data
-    /// do not alter this function
+
     void generate_sequence(){
         for(int i = 0; i < length; i++){
             sequence.push_back(randn(num));
@@ -55,10 +34,7 @@ struct mm_code_maker{
 
     /// do not alter the function interface (name, parameter list, void return)
     void give_feedback(const std::vector<int>& attempt, int& black_hits, int& white_hits){
-        /// write here your implementation for this function
-        /// which takes in input an attempt
-        /// and provides feedback in terms of black hits
-        /// and white hits (see linked paper)
+
         int total_hits = 0;
         black_hits = 0;
 
@@ -81,66 +57,7 @@ struct mm_code_maker{
 
         white_hits = total_hits - black_hits;
 
-        /*std::vector<int> black;
-        std::vector<int> whiteseq;
-        std::vector<int> whiteatt;
 
-        for(int i = 0; i < attempt.size(); i++){
-          if(attempt[i] == sequence[i]){
-            black.push_back(i);
-          }
-        }
-        black_hits = black.size();
-
-        for(int i = 0; i < attempt.size(); i++){ //hopefully fixed
-          for(int j = 0; j < sequence.size(); j++){
-            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black)) && (!check_contain(j, whiteseq)) && (!check_contain(i, whiteatt)) ){
-              whiteseq.push_back(j);
-              whiteatt.push_back(i);
-            }
-          }
-        }
-
-        white_hits = whiteseq.size();*/
-
-
-        /*for(int i = 0; i < attempt.size(); i++){ //fatal bug: cannot use elimination of same index method
-          for(int j = 0; j < sequence.size(); j++){
-            if((attempt[i] == sequence[j]) && (!check_contain(j, black)) && (!check_contain(i, black))){ //found bug, position of both sequence and attempt shouldnt be taken into account when a black hit occurs
-              //white.push_back(j); //contains repeated //found bug, j is position of sequence, since attempt is fixed to be compared with sequence, position of sequence is not repeated when position of sequence is pushed_back
-              whiteatt.push_back(i);
-              whiteseq.push_back(j);
-            }
-          }
-        }
-
-        if(check_repeat(whiteatt) < check_repeat(whiteseq)){
-          white_hits = check_repeat(whiteatt);
-        }
-        else{
-          white_hits = check_repeat(whiteseq);
-        }*/
-
-        //white_hits = check_repeat(white);
-
-      /*  if(white.size() > 0){
-          white_hits++;
-          for(int i = 1; i < white.size(); i++){
-
-            bool repeated = false;
-
-            for(int j = 0; j < white.size() && !repeated; j++){
-              if((white[i] == white[j]) && (i != j)){ //problem: repeated it self, fixed
-                repeated = true;
-              }
-            }
-
-            if(!repeated){
-              white_hits++;
-            }
-
-          }
-    } */ //problem
 
   }
 
@@ -174,12 +91,13 @@ struct mm_solver{
         length = i_length;
         num = i_num;
 
-        if(length > 7 && num > 7){
-          
+        if((length > 7) && (num > 7)){
+
+        }
+        else{
+          for(int i = 0; i < pow(num, length); i++){
+            pool.push_back(pool_generator(length, num, i));
           }
-          else{
-            for(int i = 0; i < pow(num, length); i++){
-            pool.push_back(pool_generator(length, num, i));}
         }
 
 
@@ -195,56 +113,65 @@ struct mm_solver{
     void create_attempt(std::vector<int>& attempt){
         /// write your implementation here
 
-        if(length > 7 && num > 7){
+        if((length > 7) && (num > 7)){//higher situation
 
-          if(num_of_attempt < length){
+          if(num_of_attempt < length){//testing
             for(int i = 0; i < length; i++){
               attempt.push_back(num_of_attempt);
             }
           }
-
-          else{
-            attempt.resize(length);
-            while(check_contain_vector(attempt, bad_attempt)){
-              std::vector<int> index_filled;
-              for(int i = 0; i < number.size(); i++){
-                for(int j = 0; j < number[i]; j++){
-                  int tmp;
-                  while(check_contain(randn(length), index_filled)){
-                    tmp = randn(length);
-                  }
-                  attempt[tmp] = i;
-                  index_filled.push_back(tmp);
-                }
+          else if(num_of_attempt == length){//first attempt after test
+            for(int i = 0; i < number.size(); i++){
+              for(int j = 0; j < number[i]; j++){
+                test_attempt.push_back(i);
               }
             }
-
+            attempt = test_attempt;
+          }
+          else if(num_of_attempt > length){//after test
+            attempt = test_attempt;
+            if(attempt[check_index] == check_num){
+              check_num++;
+              attempt[check_index] = check_num;
+            }
+            else{attempt[check_index] = check_num;}
+            check_num++;
 
           }
-          num_of_attempt++;
+          //num_of_attempt++;
         }
 
+
+
         else{attempt = pool[randn(pool.size())];}
-
-
-
-
-
-
     }
 
-    /// this member function acquires the feedback about a certain attempt
-    /// (see the other examples provided for clarifications)
-    /// do not alter the function interface (name, parameter list, void return)
     void learn(std::vector<int>& attempt, int black_hits, int white_hits){
         /// write your implementation here
-        if(length > 7 && num > 7){
-          if(num_of_attempt < length){
+        if((length > 7) && (num > 7)){//higher situation
+          if(num_of_attempt < length){//testing phase
             number.push_back(black_hits);
           }
-          else{
-            bad_attempt.push_back(attempt);
+          else if(num_of_attempt == length){//first attempt after test
+            //black_tmp = black_hits;
+            //white_tmp = white_hits;
           }
+          else if(num_of_attempt > length){//after test
+            if(black_hits > black_tmp){
+              test_attempt = attempt;
+              check_index++;
+              check_num = 0;
+            }
+            else if(black_hits == black_tmp){}
+            else if(black_hits < black_tmp){
+              check_index++;
+              check_num = 0;
+            }
+            black_tmp = black_hits;
+            white_tmp = white_hits;
+          }
+
+          num_of_attempt++;
         }
 
         else{
@@ -272,7 +199,9 @@ struct mm_solver{
     std::vector<int> number;//contains the number of a number at each index, number represented by index
     int black_tmp;
     int white_tmp;
-    std::vector<std::vector<int>> bad_attempt;
+    std::vector<int> test_attempt;
+    int check_index = 0; //contains the next index to be checked for blackhit
+    int check_num = 0;
 
   };
 
@@ -474,12 +403,10 @@ int number_of_num(const std::vector<int>& v, int num){
   return n;
 }
 
-bool check_contain_vector(const std::vector<int>& v1, const std::vector<std::vector<int>>& v2){ //check if v2 contains v1
-  for(int i = 0; i < v2.size(); i++){
-    if(v1 == v2[i]){
-      return true;
-    }
-  }
-  return false;
 
-}
+
+
+
+
+
+/// add here the implementation for any other functions you wish to define and use

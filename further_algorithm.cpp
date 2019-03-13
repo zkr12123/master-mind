@@ -12,6 +12,9 @@ struct mm_solver{
         num = i_num;
 
         if(length > 7 && num > 7){
+
+        }
+        else{
           for(int i = 0; i < pow(num, length); i++){
             pool.push_back(pool_generator(length, num, i));
           }
@@ -30,16 +33,32 @@ struct mm_solver{
     void create_attempt(std::vector<int>& attempt){
         /// write your implementation here
 
-        if(length > 7 && num > 7){
+        if(length > 7 && num > 7){//higher situation
 
-          if(num_of_attempt < length){
+          if(num_of_attempt < length){//testing
             for(int i = 0; i < length; i++){
               attempt.push_back(num_of_attempt);
             }
           }
-          else{
+          else if(num_of_attempt == length){//first attempt after test
+            for(int i = 0; i < number.size(); i++){
+              for(int j = 0; j < number[i]; j++){
+                test_attempt.push_back(i);
+              }
+            }
+            attempt = test_attempt;
+          }
+          else{//after test
+            attempt = test_attempt;
+            if(attempt[check_index] == check_num){
+              check_num++;
+              attempt[check_index] = check_num;
+            }
+            else{attempt[check_index = check_num];}
+            check_num++;
 
           }
+          num_of_attempt++;
         }
 
 
@@ -49,11 +68,27 @@ struct mm_solver{
 
     void learn(std::vector<int>& attempt, int black_hits, int white_hits){
         /// write your implementation here
-        if(length > 7 && num > 7){
-          if(num_of_attempt < length){
+        if(length > 7 && num > 7){//higher situation
+          if(num_of_attempt < length){//testing phase
             number.push_back(black_hits);
           }
-          else{}
+          else if(num_of_attempt == length){//first attempt after test
+            black_tmp = black_hits;
+            white_tmp = white_hits;
+          }
+          else{//after test
+            if(black_hits > black_tmp){
+              attempt = test_attempt;
+              check_index++;
+              check_num = 0;
+            }
+            else if(black_hits < black_tmp){
+              check_index++;
+              check_num = 0;
+            }
+            black_tmp = black_hits;
+            white_tmp = white_hits;
+          }
         }
 
         else{
@@ -81,5 +116,10 @@ struct mm_solver{
     std::vector<int> number;//contains the number of a number at each index, number represented by index
     int black_tmp;
     int white_tmp;
+    std::vector<int> test_attempt;
+    int check_index = 0; //contains the next index to be checked for blackhit
+    int check_num = 0;
 
   };
+
+  void check_generator(std::vector<int>& v, int check_num, int check_index)

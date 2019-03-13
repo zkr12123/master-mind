@@ -216,13 +216,13 @@ struct mm_solver{
         /*for(int i = 0; i < length; i++){
           attempt.push_back(randn(num));
         }*/
-        if(length > 7 && num > 7){
+        /*if(length > 7 && num > 7){
           if(num_of_attempt < length){
             for(int i = 0; i < length; i++){
               attempt.push_back(num_of_attempt);
             }
           }
-        }
+        }*/
 
         attempt = pool[randn(pool.size())];
         //attempt = pool[0];
