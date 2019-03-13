@@ -92,6 +92,9 @@ struct mm_solver{
         num = i_num;
 
         if((length > 7) && (num > 7)){
+          for(int i = 0; i < length; i++){
+            test_attempt.push_back(0);
+          }
 
         }
         else{
@@ -115,20 +118,22 @@ struct mm_solver{
 
         if((length > 7) && (num > 7)){//higher situation
 
-          if(num_of_attempt < length){//testing
+          if(num_of_attempt < num){//testing
             for(int i = 0; i < length; i++){
               attempt.push_back(num_of_attempt);
             }
           }
-          else if(num_of_attempt == length){
-            for(int i = 0; i < number.size(); i++){
-              for(int j = 0; j < number[i]; j++){
-                test_attempt.push_back(i);
-              }
+          else{//after test
+            if(!found_test_attempt){//finding starting vector
+              for(int i = 0; i < length; i++){
+              attempt.push_back(randn(num));
             }
-            attempt = test_attempt;
           }
-          else if(num_of_attempt > length){}
+          else{//start vector found
+            attempt = test_attempt;
+            attempt[check_index] = number[check_num];//check each index of the attempt with numbers from numbervector
+          }
+          }
 
         }
 
@@ -140,12 +145,32 @@ struct mm_solver{
     void learn(std::vector<int>& attempt, int black_hits, int white_hits){
         /// write your implementation here
         if((length > 7) && (num > 7)){//higher situation
-          if(num_of_attempt < length){//testing phase
-            number.push_back(black_hits);
+
+          if(num_of_attempt < num){//testing phase
+            for(int i = 0; i < black_hits; i++){
+              number.push_back(num_of_attempt);
+            }
           }
-          else if(num_of_attempt == length){//first attempt after test
-            //black_tmp = black_hits;
-            //white_tmp = white_hits;
+          else{
+            if((black_hits == 0) && (!found_test_attempt)){
+              test_attempt = attempt;
+              found_test_attempt = true;
+              black_tmp = black_hits;
+            }
+            else if(found_test_attempt){//actual test phase
+              if(black_hits > black_tmp){
+                test_attempt = attempt;
+                number.erase(number.begin() + check_num);
+                check_index++;
+                check_num = 0;
+                black_tmp = black_hits;
+              }
+              else{
+                check_num++;
+              }
+            }
+
+
           }
 
 
@@ -178,6 +203,7 @@ struct mm_solver{
     int black_tmp;
     int white_tmp;
     std::vector<int> test_attempt;
+    bool found_test_attempt = false;
     int check_index = 0; //contains the next index to be checked for blackhit
     int check_num = 0;
 
@@ -381,9 +407,7 @@ int number_of_num(const std::vector<int>& v, int num){
   return n;
 }
 
-void kill_index(const std::vector<int>& v, int index){
-  v.erase(v.begin() + index);
-}
+
 
 
 
