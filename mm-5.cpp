@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-
+//hi
 
 void set_random_seed();
 int randn(int n);
