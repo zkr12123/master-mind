@@ -225,7 +225,54 @@ struct mm_solver{
 
   };
 
-int main(){
+  int main(){
+    set_random_seed();
+    int length, num;
+    std::cout << "enter length of sequence and number of possible values:" << std::endl;
+    std::cin >> length >> num;
+
+
+
+    int trial_limit = 10000;
+    int trial = 0;
+    int total_attempts = 0;
+
+    while(trial < trial_limit){
+      int attempts = 0;
+      int black_hits=0, white_hits=0;
+
+      mm_solver solver;
+      solver.init(length, num);
+
+      mm_code_maker maker;
+      maker.init(length, num);
+      maker.generate_sequence();
+
+      while(black_hits < length){
+        std::vector<int> attempt;
+        solver.create_attempt(attempt);
+        maker.give_feedback(attempt, black_hits, white_hits);
+        solver.learn(attempt, black_hits, white_hits);
+        attempts++;
+        total_attempts++;
+      }
+      std::cout << "this trial takes: " << attempts << " attempts" << std::endl;
+
+    trial++;
+
+  }
+  std::cout << std::endl;
+
+  double average = total_attempts / trial_limit;
+  std::cout << "total attempts: " << total_attempts << std::endl;
+  std::cout << "average attempts each trial: " << average << std::endl;
+
+  return 0;
+
+
+  }
+
+/*int main(){
     /// write the code for the main here in order to test your functions
     /// the main is not relevant for this assignment and we will remove it
     /// from the submissions during the marking
@@ -271,7 +318,7 @@ int main(){
     }
     std::cout << std::endl;
     return 0;
-}
+}*/
 
 /// not a great implementation for set_random_seed and for randn;
 /// if you are trying to get better results you may want to change
