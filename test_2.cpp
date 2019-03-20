@@ -3,20 +3,26 @@
 
 //this tests pool_generator
 
-std::vector<int> pool_generator(int length, int num, int count);
+void pool_generator(int length, int num, int count, std::vector<int>& v);
 int pow(int a, int b);
 
 int main(){
   std::cout << "pumping vectors..." << std::endl;
-  int num = 9;
-  int length = 9;
+  int num = 6;
+  int length = 4;
   std::vector<std::vector<int>> pool;
 
   for(int i = 0; i < pow(num, length); i++){
-    pool.push_back(pool_generator(length, num, i));
+    std::vector<int> tmp;
+    pool_generator(length, num, i, tmp);
+    pool.push_back(tmp);
+    for(int j = 0; j < tmp.size(); j++){
+      std::cout << tmp[j] << " ";
+    }
+    std::cout << std::endl;
   }
 
-  std::cout << "pool size: " << pool.size() << std::endl;
+  std::cout << std::endl << "pool size: " << pool.size() << std::endl;
 
   /*for(int i = 0; i < pool.size(); i++){
     for(int j = 0; j < pool[i].size(); j++){
@@ -41,7 +47,7 @@ int main(){
 
 
 
-std::vector<int> pool_generator(int length, int num, int count){
+/*std::vector<int> pool_generator(int length, int num, int count){
   //int set_length = pow(num, length);
   std::vector<int> v, tmp;
   //int tmp = count;
@@ -62,6 +68,28 @@ std::vector<int> pool_generator(int length, int num, int count){
   }
 
   return v;
+}*/
+
+void pool_generator(int length, int num, int count, std::vector<int>& v){
+  //int set_length = pow(num, length);
+  std::vector<int> tmp;
+  //int tmp = count;
+  for(int i = 0; i < length; i++){
+    v.push_back(0);
+  }
+
+  int quotient = count;
+  int remainder;
+  while(quotient != 0){
+    remainder = quotient % num;
+    quotient = (int) quotient / num;
+    tmp.push_back(remainder);
+  }
+
+  for(int i = v.size() - 1, j = 0; j < tmp.size(); i--, j++){
+    v[i] = tmp[j];
+  }
+
 }
 
 int pow(int a, int b){

@@ -13,6 +13,7 @@ int pow(int a, int b);
 void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int num, int& black_hits, int& white_hits);
 int number_of_num(const std::vector<int>& v, int num);
 int min(int n1, int n2);
+//improved algorithm which eliminates a number from the number vector when the number is confirmed
 
 
 

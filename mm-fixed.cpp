@@ -2,20 +2,21 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
-//hi
-//first correct implementation of higher length algorithm
+
 
 void set_random_seed();
 int randn(int n);
 bool check_contain(int n, const std::vector<int>& v);
-//int check_repeat(const std::vector<int>& v);
-std::vector<int> pool_generator(int length, int num, int count);
+int check_repeat(const std::vector<int>& v);
+void pool_generator(int length, int num, int count, std::vector<int>& v);
 int pow(int a, int b);
 void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int num, int& black_hits, int& white_hits);
 int number_of_num(const std::vector<int>& v, int num);
 int min(int n1, int n2);
-//void extract_digits(int num, std::vector<int>& v);
-
+//improved guessing algorithm for finding 0 black_hits
+//the testing phase where (num_of_attempt < num) now also looks for vector with 0 black_hits
+//this algorithm does not work well when length is significantly greater than num
+//e.g. 30/8 because it takes too many steps to generate a vector with no black_hits
 
 
 
@@ -102,7 +103,9 @@ struct mm_solver{
         }
         else{
           for(int i = 0; i < pow(num, length); i++){
-            pool.push_back(pool_generator(length, num, i));
+            std::vector<int> tmp;
+            pool_generator(length, num, i, tmp);
+            pool.push_back(tmp);
           }
         }
 
@@ -134,7 +137,7 @@ struct mm_solver{
           }
           else{//start vector found
             attempt = test_attempt;
-            attempt[check_index] = number[check_num];//check each index of the attempt with numbers from numbervector
+            attempt[check_index] = number[check_num];//check each index of the attempt with numbers from numbervector, starting with check_index = 0, check_num = 0
           }
           }
 
@@ -153,12 +156,16 @@ struct mm_solver{
             for(int i = 0; i < black_hits; i++){
               number.push_back(num_of_attempt);
             }
+            if((black_hits == 0) && (!found_test_attempt)){//improvement
+              found_test_attempt = true;
+              test_attempt = attempt;
+            }
           }
           else{
-            if((black_hits == 0) && (!found_test_attempt)){
+            if((black_hits == 0) && (!found_test_attempt)){//this now represents the worst case scenario //or situation when length is greater than num
               test_attempt = attempt;
               found_test_attempt = true;
-              black_tmp = black_hits;
+              //black_tmp = black_hits; //starting test vector has 0 black_hits, already initialized to 0
             }
             else if(found_test_attempt){//actual test phase
               if(black_hits > black_tmp){
@@ -167,9 +174,16 @@ struct mm_solver{
                 check_index++;
                 check_num = 0;
                 black_tmp = black_hits;
+                tested_num.clear();
               }
               else{
-                check_num++;
+                //check_num++;
+                tested_num.push_back(number[check_num]);
+                for(int i = 0; i < number.size(); i++){
+                  if(!check_contain(number[i], tested_num)){
+                    check_num = i;
+                  }
+                }
               }
             }
 
@@ -203,9 +217,10 @@ struct mm_solver{
     std::vector<std::vector<int>> pool;
     int num_of_attempt = 0;
     std::vector<int> number;//contains the number of a number at each index, number represented by index
-    int black_tmp;
+    int black_tmp = 0;//starting test vector has 0 black_hits
     int white_tmp;
     std::vector<int> test_attempt;
+    std::vector<int> tested_num; //contains number already tested for blackhit, must be cleared for every check_index
     bool found_test_attempt = false;
     int check_index = 0; //contains the next index to be checked for blackhit
     int check_num = 0;
@@ -274,7 +289,7 @@ int randn(int n){
     return std::rand() % n;
 }
 
-bool check_contain(int n, const std::vector<int>& v){
+bool check_contain(int n, const std::vector<int>& v){//return true if the vector contains n
   bool contain = false;
   for(int i = 0; i < v.size() && !contain; i++){
     if(n == v[i]){
@@ -284,7 +299,7 @@ bool check_contain(int n, const std::vector<int>& v){
   return contain;
 }
 
-/*int check_repeat(const std::vector<int>& v){
+int check_repeat(const std::vector<int>& v){
   std::vector<int> single;
 
   for(int i = 0; i < v.size(); i++){
@@ -300,9 +315,9 @@ bool check_contain(int n, const std::vector<int>& v){
   }
 
   return single.size();
-}*/
+}
 
-/*int num_of_digits(int num){//returns number of digits in an int
+int num_of_digits(int num){//returns number of digits in an int
   int i = 10, j = 1;
   while(true){
     if(num < i){
@@ -311,9 +326,9 @@ bool check_contain(int n, const std::vector<int>& v){
     i = i * 10;
     j = j + 1;
   }
-}*/
+}
 
-/*void extract_digits(int num, std::vector<int>& v){ //extract digits from an int into a vector
+void extract_digits(int num, std::vector<int>& v){ //extract digits from an int into a vector
   int length = num_of_digits(num);
   if(length == 1){
     v.push_back(num);
@@ -330,7 +345,7 @@ bool check_contain(int n, const std::vector<int>& v){
 
     v.push_back((num - tmp) / pow(10, length - 1));
   }
-}*/
+}
 
   int pow(int a, int b){
     int n = a;
@@ -340,9 +355,9 @@ bool check_contain(int n, const std::vector<int>& v){
     return n;
   }
 
-  std::vector<int> pool_generator(int length, int num, int count){
+  void pool_generator(int length, int num, int count, std::vector<int>& v){
     //int set_length = pow(num, length);
-    std::vector<int> v, tmp;
+    std::vector<int> tmp;
     //int tmp = count;
     for(int i = 0; i < length; i++){
       v.push_back(0);
@@ -360,7 +375,6 @@ bool check_contain(int n, const std::vector<int>& v){
       v[i] = tmp[j];
     }
 
-    return v;
   }
 
   void give_feedback_trial(const std::vector<int>& attempt, const std::vector<int>& trial, int num, int& black_hits, int& white_hits){
@@ -400,7 +414,7 @@ int min(int n1, int n2){//out put the smaller num of the two
 
 }
 
-int number_of_num(const std::vector<int>& v, int num){//this function returns the number of num presents in a vector v
+int number_of_num(const std::vector<int>& v, int num){
   int n = 0;
   for(int i = 0; i < v.size(); i++){
     if(v[i] == num){
