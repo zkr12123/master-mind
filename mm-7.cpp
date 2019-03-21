@@ -401,9 +401,7 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
   }
 
   std::vector<int> pool_generator(int length, int num, int count){
-    //int set_length = pow(num, length);
     std::vector<int> v, tmp;
-    //int tmp = count;
     for(int i = 0; i < length; i++){
       v.push_back(0);
     }

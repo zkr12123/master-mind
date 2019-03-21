@@ -17,6 +17,7 @@ int min(int n1, int n2);
 //the testing phase where (num_of_attempt < num) now also looks for vector with 0 black_hits
 //this algorithm does not work well when length is significantly greater than num
 //e.g. 30/8 because it takes too many steps to generate a vector with no black_hits
+//fixed pool_generator to void according to requirement
 
 
 
