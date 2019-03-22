@@ -2,14 +2,15 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <cmath>
 
 
 void set_random_seed();
 int randn(int n);
 bool check_contain(int n, const std::vector<int>& v);
 int check_repeat(const std::vector<int>& v);
-std::vector<int> pool_generator(int length, int num, int count);
-int pow(int a, int b);
+void pool_generator(int length, int num, int count, std::vector<int>& v);
+//int pow(int a, int b);
 void give_feedback_trial(const std::vector<int>& attempt,const std::vector<int>& trial, int num, int& black_hits, int& white_hits);
 int number_of_num(const std::vector<int>& v, int num);
 int min(int n1, int n2);
@@ -17,6 +18,7 @@ int min(int n1, int n2);
 //the testing phase where (num_of_attempt < num) now also looks for vector with 0 black_hits
 //this algorithm does not work well when length is significantly greater than num
 //e.g. 30/8 because it takes too many steps to generate a vector with no black_hits
+//fixed pool_generator to void according to requirement
 
 
 
@@ -94,18 +96,18 @@ struct mm_solver{
     void init(int i_length, int i_num){
         length = i_length;
         num = i_num;
-
-        if((length > 7) && (num > 7)){
-          for(int i = 0; i < length; i++){
-            test_attempt.push_back(0);
-          }
-
+        if(log(pow(num, length)) > log(1953126)){
+          high_order = true;
         }
-        else{
+
+        if(!high_order){
           for(int i = 0; i < pow(num, length); i++){
-            pool.push_back(pool_generator(length, num, i));
+            std::vector<int> tmp;
+            pool_generator(length, num, i, tmp);
+            pool.push_back(tmp);
           }
         }
+
 
 
 
@@ -120,7 +122,7 @@ struct mm_solver{
     void create_attempt(std::vector<int>& attempt){
         /// write your implementation here
 
-        if((length > 7) && (num > 7)){//higher situation
+        if((high_order) && (length <= num)){//higher situation 5^9
 
           if(num_of_attempt < num){//testing
             for(int i = 0; i < length; i++){
@@ -134,21 +136,37 @@ struct mm_solver{
             }
           }
           else{//start vector found
-            attempt = test_attempt;
+            attempt = test_attempt;//test_attempt kept unchanged
             attempt[check_index] = number[check_num];//check each index of the attempt with numbers from numbervector, starting with check_index = 0, check_num = 0
           }
           }
 
         }
 
+        else if((high_order) && (length > num)){
+          if(num_of_attempt < num){//testing
+            for(int i = 0; i < length; i++){
+              attempt.push_back(num_of_attempt);
+            }
+            if(num_of_attempt == 0){
+              test_attempt = attempt;//define test_attempt
+            }
+          }
+          else{//after testing phase
+            attempt = test_attempt;
+            attempt[check_index] = number[check_num];
+          }
+
+        }
 
 
-        else{attempt = pool[randn(pool.size())];}
+
+        else if(!high_order){attempt = pool[randn(pool.size())];}
     }
 
     void learn(std::vector<int>& attempt, int black_hits, int white_hits){
         /// write your implementation here
-        if((length > 7) && (num > 7)){//higher situation
+        if((high_order) && (length <= num)){//higher situation
 
           if(num_of_attempt < num){//testing phase
             for(int i = 0; i < black_hits; i++){
@@ -192,7 +210,47 @@ struct mm_solver{
           num_of_attempt++;
         }
 
-        else{
+        else if((high_order) && (length > num)){
+
+          if(num_of_attempt < num){//testing phase
+            if(num_of_attempt == 0){
+              black_tmp = black_hits;
+            }
+            else{
+              for(int i = 0; i < black_hits; i++){
+                number.push_back(num_of_attempt);
+              }
+            }
+        }
+
+        else{//after test
+          if(black_hits < black_tmp){
+            check_index++;
+            check_num = 0;
+          }
+          else if(black_hits == black_tmp){
+            tested_num.push_back(number[check_num]);
+            for(int i = 0; i < number.size(); i++){
+              if(!check_contain(number[i], tested_num)){
+                check_num = i;
+              }
+            }
+          }
+          else if(black_hits > black_tmp){
+            test_attempt = attempt;
+            number.erase(number.begin() + check_num);
+            check_index++;
+            check_num = 0;
+            black_tmp = black_hits;
+            tested_num.clear();
+          }
+
+        }
+
+        num_of_attempt++;
+      }
+
+        else if(!high_order){
         std::vector<std::vector<int>> newpool;
 
           int black_new, white_new;
@@ -212,67 +270,21 @@ struct mm_solver{
 
     int length;
     int num;
-    std::vector<std::vector<int>> pool; //this is the pool vector which contains all possibilities of code arrangement in vectors<int>
-    int num_of_attempt = 0;//declare an integer which counts the number of times an attempt has been made, increases everytime the learn function is called, important for indicating which stage the solver is at
-    std::vector<int> number;//contains all the symbols that have been proven to be present in the correct code, symbols arranged from the least number to the greatest number
+    std::vector<std::vector<int>> pool;
+    int num_of_attempt = 0;
+    std::vector<int> number;//contains the number of a number at each index, number represented by index
     int black_tmp = 0;//starting test vector has 0 black_hits
     //int white_tmp;
-    std::vector<int> test_attempt;//contains a code that is defined as a starting vector to have its index checked and exchanged for black hit
-    std::vector<int> tested_num; //contains number already checked for blackhit within the exchanging process of a specific index, must be cleared when the exchanging process moves forward to the next index
-    bool found_test_attempt = false;//this boolean variable stores the information of whether a starting vector is found
-    int check_index = 0; //this integer indicates the index of the test_attempt to be exchanged to check for black hit in the next attempt
-    int check_num = 0;//this integer indicates the index of the symbol contained in the numbervector to be used to exchange with the index in the test_attempt to check for balck hit
+    std::vector<int> test_attempt;
+    std::vector<int> tested_num; //contains number already tested for blackhit, must be cleared for every check_index
+    bool found_test_attempt = false;
+    int check_index = 0; //contains the next index to be checked for blackhit
+    int check_num = 0;
+    bool high_order = false;//this boolean variable stores the information of whether the HOPSIES algorithm should be used
 
   };
 
-  int main(){
-    set_random_seed();
-    int length, num;
-    std::cout << "enter length of sequence and number of possible values:" << std::endl;
-    std::cin >> length >> num;
-
-
-
-    int trial_limit = 10000;
-    int trial = 0;
-    int total_attempts = 0;
-
-    while(trial < trial_limit){
-      int attempts = 0;
-      int black_hits=0, white_hits=0;
-
-      mm_solver solver;
-      solver.init(length, num);
-
-      mm_code_maker maker;
-      maker.init(length, num);
-      maker.generate_sequence();
-
-      while(black_hits < length){
-        std::vector<int> attempt;
-        solver.create_attempt(attempt);
-        maker.give_feedback(attempt, black_hits, white_hits);
-        solver.learn(attempt, black_hits, white_hits);
-        attempts++;
-        total_attempts++;
-      }
-      std::cout << "this trial takes: " << attempts << " attempts" << std::endl;
-
-    trial++;
-
-  }
-  std::cout << std::endl;
-
-  double average = total_attempts / trial_limit;
-  std::cout << "total attempts: " << total_attempts << std::endl;
-  std::cout << "average attempts each trial: " << average << std::endl;
-
-  return 0;
-
-
-  }
-
-/*int main(){
+int main(){
     /// write the code for the main here in order to test your functions
     /// the main is not relevant for this assignment and we will remove it
     /// from the submissions during the marking
@@ -318,7 +330,7 @@ struct mm_solver{
     }
     std::cout << std::endl;
     return 0;
-}*/
+}
 
 /// not a great implementation for set_random_seed and for randn;
 /// if you are trying to get better results you may want to change
@@ -392,16 +404,18 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
   }
 }
 
-  int pow(int a, int b){
+  /*int pow(int a, int b){
     int n = a;
     for(int i = 1; i < b; i++){
       n = n * a;
     }
     return n;
-  }
+  }*/
 
-  std::vector<int> pool_generator(int length, int num, int count){
-    std::vector<int> v, tmp;
+  void pool_generator(int length, int num, int count, std::vector<int>& v){
+    //int set_length = pow(num, length);
+    std::vector<int> tmp;
+    //int tmp = count;
     for(int i = 0; i < length; i++){
       v.push_back(0);
     }
@@ -418,7 +432,6 @@ void extract_digits(int num, std::vector<int>& v){ //extract digits from an int 
       v[i] = tmp[j];
     }
 
-    return v;
   }
 
   void give_feedback_trial(const std::vector<int>& attempt, const std::vector<int>& trial, int num, int& black_hits, int& white_hits){
