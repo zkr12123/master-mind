@@ -229,6 +229,7 @@ struct mm_solver{
   };
 
   int main(){
+    while(true){
     set_random_seed();
     int length, num;
     std::cout << "enter length of sequence and number of possible values:" << std::endl;
@@ -236,7 +237,7 @@ struct mm_solver{
 
 
 
-    int trial_limit = 1000;
+    int trial_limit = 100;
     int trial = 0;
     int total_attempts = 0;
 
@@ -269,6 +270,7 @@ struct mm_solver{
   double average = total_attempts / trial_limit;
   std::cout << "total attempts: " << total_attempts << std::endl;
   std::cout << "average attempts each trial: " << average << std::endl;
+}
 
   return 0;
 
